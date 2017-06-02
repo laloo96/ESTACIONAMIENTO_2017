@@ -1,0 +1,19 @@
+		.navbar-default .navbar-nav > li > a {
+		   color: #232696; /*Change active text color here*/
+		   font-size: 15px;
+		   font-family: fantasy;
+		}
+
+		/*Color titulo derecho*/
+		.navbar-default .navbar-header >a {
+		   color: #225D9A; /*Change active text color here*/
+		   font-size: 20px;
+		   font-family: "Arial Black", Gadget, sans-serif;
+		}
+
+
+		.navbar-nav li > a {
+		   color: #050202; /*Change active text color here*/
+		   font-size: 20px;
+		   font-family: "Arial Black", Gadget, sans-serif;
+		}
