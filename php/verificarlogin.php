@@ -11,16 +11,14 @@ if ($_POST["op"] == "login") {
 
 	if (isset($user) && isset($pass)) {
 
-
 		$conexion = AccesoDatos::dameUnObjetoAcceso();
-
 	    $statement = $conexion->RetornarConsulta("SELECT * FROM `usuarios` WHERE 1");
 
 		if ($statement->execute()) {	
 
 			$data = $statement->fetchall();
 
-			foreach ($data as $value) {
+			foreach ($data as $value) {		
 				
 				if ($value["usuario"] == $user && $value["password"] == $pass) {
 					$letLogin = TRUE;
@@ -28,22 +26,18 @@ if ($_POST["op"] == "login") {
 				}
 			}
 
-	
 			if($letLogin === TRUE){
 				
-				session_start();
-				
+				session_start();			
 				$_SESSION["user"] = $user;
 				
 				echo "ok";
 			}
-			else
-			{
+			else{
 				echo "error";
 			}
 		}
-		else
-		{	
+		else{	
 			echo "error";
 		}
 
@@ -53,7 +47,7 @@ if ($_POST["op"] == "login") {
 else if($_POST["op"] == "logout")
 {	
 	session_start();
-
+	
 	$_SESSION["user"] = NULL;
 
 	session_destroy();
