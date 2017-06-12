@@ -25,16 +25,16 @@ function DisplayFormIngreso()
         $(html).appendTo("#es");
 }
 
+
 function DisplayTablaSalida()
 {
 		$("#es").empty();
 		
-		var datos = "op=salida";
 		$.ajax({
-		type:"POST", 
+		type:"GET", 
 		dataType:"JSON", 
-		url:"./php/AdministrarES.php",
-		data:datos,
+		crossDomain: true,
+		url:"http://localhost:8080/TP_ESTACIONAMIENTO2017/php/AdministrarES.php/autosLive",
 		async:true,
 		})
 		.done(function(valor){
@@ -95,7 +95,8 @@ function AgregarAuto()
 		$.ajax({
 		type:"POST", 
 		dataType:"Text", 
-		url:"./php/AdministrarES.php",
+		url:"http://localhost:8080/TP_ESTACIONAMIENTO2017/php/AdministrarES.php/ingresarAuto",
+		crossDomain: true,
 		data:datos,
 		async:true,
 		})

@@ -1,12 +1,13 @@
 
 <?php
 session_start();
-if(isset($_SESSION["user"]))
+if(isset($_SESSION["user"]) || isset($_SESSION["admin"]))
 {?>
 		<!DOCTYPE html>
 			<html>
 			<head>
 				<title></title>
+				
 					<!-- Latest compiled and minified CSS -->
 					<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
 
@@ -16,11 +17,11 @@ if(isset($_SESSION["user"]))
 					<!-- Latest compiled JavaScript -->
 					<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 
-				<style type="text/css" src="css/estilos.css"></style>
+					<style type="text/css" src="css/estilos.css"></style>
 
-				<script type="text/javascript" src="js/nexologin.js"></script>
-				
-				<script type="text/javascript" src="js/nexoES.js"></script>
+					<script type="text/javascript" src="js/nexologin.js"></script>
+					
+					<script type="text/javascript" src="js/nexoES.js"></script>
 
 			</head>
 
@@ -36,7 +37,7 @@ if(isset($_SESSION["user"]))
 										
 									</button>
 									
-									<a class="navbar-brand" href="miPagina.php" >PRIMER PARCIAL</a>    
+									<a class="navbar-brand" href="miPagina.php" >Estacionamiento 24HS</a>    
 								</div>
 
 								<!-- Collect the nav links, forms, and other content for toggling -->
