@@ -86,6 +86,29 @@ class Empleado
 				return FALSE;
 		}
 
+		public static function ExisteUsuario()
+		{	
+			$existe = FALSE;
+
+			$conexion = AccesoDatos::dameUnObjetoAcceso();
+			$statement = $conexion->RetornarConsulta("SELECT * FROM `usuarios` WHERE 1");
+
+			if ($statement->execute()) {	
+
+				$data = $statement->fetchall();
+
+				foreach ($data as $value) {		
+					
+					if ($value["usuario"] == $user && $value["password"] == $pass) {
+						$existe = TRUE;
+						break;
+					}
+				}	
+			}
+
+			return $existe;
+		}
+
 	//--------------------------------------------------------------------------------//
 }
 

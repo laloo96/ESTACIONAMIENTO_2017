@@ -1,18 +1,24 @@
 <?php
+use \Psr\Http\Message\ServerRequestInterface as Request;
+use \Psr\Http\Message\ResponseInterface as Response;
+
+$config['displayErrorDetails'] = true;
+$config['addContentLengthHeader'] = false;
+
 require_once("AccesoDatos.php");
+require_once("../vendor/autoload.php");
+require_once("../clases/Vehiculo.php");
 
 header("Access-Control-Allow-Origin: *");
 
-require_once "../vendor/autoload.php";
-
-$app = new \Slim\Slim();
+$app = new \Slim\app(["settings" => $config]);
 
 session_start();
 
 /*
 *   Ingresa un auto a la cochera.
 */
-$app->POST('/ingresarAuto', function() use($app) {
+$app->POST('/POST/ingresarAuto', function() use($app) {
 
     $patente = $_POST["patente"] ?: NULL;
     $color   = $_POST["color"]   ?: NULL;
@@ -39,62 +45,31 @@ $app->POST('/ingresarAuto', function() use($app) {
 });
 
 
-/*
+/*                       FUNCIONANDO!!!
 * Retorna JSON con tabla de autos estacionados en este momento.
 */ 
-$app->GET('/autosLive', function() use($app) {
+$app->get('/get/autosLive', function(Request $request, Response $response){
 
-    $conexion = AccesoDatos::dameUnObjetoAcceso();
-    $statement = $conexion->RetornarConsulta("SELECT * FROM cocheralive WHERE 1");
-    
-    if($statement->execute()){       
-        
-        $autosLive = $statement->fetchall();
-    }
+    $autoslive = Vehiculo::TraerTodos();
     // Indicamos el tipo de contenido y condificación que devolvemos desde el framework Slim.
-	$app->response->headers->set("Content-type", "application/json");
-	$app->response->status(200);
-	$app->response->body(json_encode($autosLive));
+    $response->getBody()->write(json_encode($autoslive));
 });
 
 /*
 *   Remuve un auto de acuerdo al id pasado.
 */
-$app->DELETE('/retirarAuto', function($id) use($app) {
-        
-    if (isset($id)) {
-       
-        $conexion = AccesoDatos::dameUnObjetoAcceso();
-        $statement = $conexion->RetornarConsulta("DELETE FROM cocheralive WHERE id=?");    
-        
-        $statement->bindParam(1,$_POST["id"]);
+$app->delete('/auto/{id}', function(Request $request, Response $response, $args){
 
-        if($statement->execute()){                 
-            echo "ok";
+        $id = $args['id'];
+        $respuesta = "errorenapi";
+
+        if (isset($id)) {
+             $respuesta = Vehiculo::DameUnAuto($id);
         }
-        else
-            echo "error";
 
-    }
-    else
-        echo "error";
+        $response->getBody()->write("pepe piola");
 });
 
-/*
-if ($_POST["op"] == "RemoverAuto" && isset($_POST["id"])) {
-
-        $conexion = AccesoDatos::dameUnObjetoAcceso();
-        $statement = $conexion->RetornarConsulta("DELETE FROM cocheralive WHERE id=?");
-
-        $statement->bindParam(1,$_POST["id"]);
-
-        if ($statement->execute())
-            echo "ok";
-        else
-            echo "error";
-}
-
-*/
 $app->run();
 
 ?>

@@ -1,4 +1,5 @@
 <?php
+require_once('../php/AccesoDatos.php');
 
 class Vehiculo
 {
@@ -31,9 +32,9 @@ class Vehiculo
 		return $this->saldia;
 	}
 
-	public function SetEntrada($valor)
+	public function GetEntrada($valor)
 	{
-		$this->entrada = $valor;
+		return $this->entrada;
 	}
 
 	public function SetPatente($valor)
@@ -82,75 +83,108 @@ class Vehiculo
 
 //--------------------------------------------------------------------------------//
 //--METODOS DE CLASE
-	public function RegistrarEntrada()
+
+	/*
+	* Ingresa un auto en la chochera.
+	*//*
+	public static function IngresarAuto()
     {
 
     }
-    
-    public function RegistrarSalida()
-    {
+*/
+	/*
+	*	Remuve el auto de los estacionados y lo registra en la tabla de autos egresados.
+	*/
+    public static function EgresarAuto($id){	
+		
+		if (isset($id)) {	
 
-    }
-    
-    
-    
-    /*public static function Guardar($obj)
-	{
-		$resultado = FALSE;
-		
-		//ABRO EL ARCHIVO
-		$ar = fopen("archivos/productos.txt", "a");
-		
-		//ESCRIBO EN EL ARCHIVO
-		$cant = fwrite($ar, $obj->ToString());
-		
-		if($cant > 0)
-		{
-			$resultado = TRUE;			
+			$respuesta = "error";
+
+			$vehiculoaegresar = Vehiculo::DameUnAuto($id);
+
+			echo"ME DIO ESTE AUTO";
+			var_dump($vehiculoaegresar);
+			
+        	$conexion = AccesoDatos::dameUnObjetoAcceso();
+			$statement = $conexion->RetornarConsulta("DELETE FROM cocheralive WHERE id=?");
+
+			$statement->bindParam(1,$id);
+			
+			if($statement->execute()){   
+
+				echo"ESTOY POR REGISTRAR SALIDA YA LO ELIMINE";
+				var_dump($vehiculoaegresar);
+				
+				if (Vehiculo::RegistrarSalida($vehiculoaegresar) === TRUE) {
+					$respuesta = "ok";
+				}
+			}	
 		}
-		//CIERRO EL ARCHIVO
-		fclose($ar);
 		
-		return $resultado;
+		return $respuesta;
+    }
+
+	public static function RegistrarSalida($autoaegresar)
+	{	
+			$conexion = AccesoDatos::dameUnObjetoAcceso();
+
+			$statement = $conexion->RetornarConsulta("INSERT INTO `egresos`(`color`, `patente`, `marca`, `entrada`, `salida`) VALUES (?,?,?,?,NOW())");  
+
+			$statement->bindParam(1,$autoaegresar['color']);
+			$statement->bindParam(2,$autoaegresar['patente']);
+			$statement->bindParam(3,$autoaegresar['marca']);
+			$statement->bindParam(4,$autoaegresar['entrada']);
+
+			if ($statement->execute()) {
+				return TRUE;
+			}
+			else
+				return FALSE;
 	}
 
-	public static function TraerTodosLosProductos()
-	{
+	/*
+	* Retorna el auto estacionado segun el id pasado.
+	*/
+	public static function DameUnAuto($id)
+	{	
+		$vehiculo = "nada";	
 
-		$ListaDeProductosLeidos = array();
+		echo "aca esta el aidi en functiones".$id;
 
-		//leo todos los productos del archivo
-		$archivo=fopen("archivos/productos.txt", "r");
+		$conexion = AccesoDatos::dameUnObjetoAcceso();
+		$statement = $conexion->RetornarConsulta("SELECT * FROM cocheralive WHERE id=?");  
+
+		$statement->bindParam(1,$id);
 		
-		while(!feof($archivo))
-		{
-			$archAux = fgets($archivo);
-			$productos = explode(" - ", $archAux);
-			//http://www.w3schools.com/php/func_string_explode.asp
-			$productos[0] = trim($productos[0]);
-			if($productos[0] != ""){
-				$ListaDeProductosLeidos[] = new Producto($productos[0], $productos[1],$productos[2]);
-			}
+		if($statement->execute()){   
+			$vehiculo = $statement->fetchall(); 
+			var_dump($vehiculo);
 		}
-		fclose($archivo);
+		else
+			echo "error";
+
+		return $vehiculo;	
+	}
+
+	/*          FUNCIONANDO!!
+	* Devuelvue todos los autos estacionados en este momento.
+	*/
+	public static function TraerTodos()
+	{
+		$conexion = AccesoDatos::dameUnObjetoAcceso();
+		$statement = $conexion->RetornarConsulta("SELECT * FROM cocheralive WHERE 1");
 		
-		return $ListaDeProductosLeidos;
-		
-	}*/
+		if($statement->execute()){       
+			
+			$autoslive = $statement->fetchall();
+
+		}
+
+		return $autoslive;
+	}
+
 //--------------------------------------------------------------------------------//
-
-
-
-
-
-
-
-
 }
-
-
-
-
-
 
 ?>

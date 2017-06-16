@@ -115,13 +115,13 @@ function AgregarAuto()
 
 function RetirarAuto(idAEliminar)
 {
-    var datos = "id=" + idAEliminar + "&op=RemoverAuto";
+    //var datos = "id=" + idAEliminar + "&op=RemoverAuto";
 
 		$.ajax({
-		type:"POST", 
+		type:"DELETE", 
 		dataType:"Text", 
-		url:"./php/AdministrarES.php",
-		data:datos,
+		url:"/php/AdministrarES.php/",
+		data:{id: idAEliminar},
 		async:true,
 		})
 		.done(function(valor){
