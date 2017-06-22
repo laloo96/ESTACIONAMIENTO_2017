@@ -1,102 +1,55 @@
 <?php
 
-require_once('AccesoDatos.php');
+require_once('../nusoap-0.9.5/lib/nusoap.php');
 
-if ($_POST["op"] == "login") {	
+$host = 'http://localhost:8080/TP_ESTACIONAMIENTO2017/php/loginWS.php';
 
-	$letLogin = FALSE;
-	
-	$user = $_POST["usuario"] ? $_POST["usuario"] : NULL;
-	$pass = $_POST["password"] ? $_POST["password"] : NULL;
+$client = new nusoap_client($host . '?wsdl');
 
-	if (isset($user) && isset($pass)) {
+$err = $client->getError();
 
-		$conexion = AccesoDatos::dameUnObjetoAcceso();
-	    $statement = $conexion->RetornarConsulta("SELECT * FROM `usuarios` WHERE 1");
+$respuestaWS = "error";
 
-		if ($statement->execute()) {	
-
-			$data = $statement->fetchall();
-
-			foreach ($data as $value) {		
-				
-				if ($value["usuario"] == $user && $value["password"] == $pass) {
-					$letLogin = TRUE;
-					break;
-				}
-			}
-
-			if($letLogin === TRUE){
-				
-				session_start();			
-				$_SESSION["user"] = $user;
-				
-				echo "ok";
-			}
-			else{
-				echo "error";
-			}
-		}
-		else{	
-			echo "error";
-		}
-
-	}	
-	
+if ($err) {
+	echo "error contructor WS.";
+	die();
 }
-else if($_POST["op"] == "logout")
-{	
-	session_start();
+else{
 	
-	$_SESSION["user"] = NULL;
+	if ($_POST["op"] == "login") {	
 
-	session_destroy();
-
-	echo "ok";
-}
-
-
-/*
-require_once('AccesoDatos.php');
-require_once('../nusoap-0.9.5/lib/nusoap.php'); 
-
-$server = new nusoap_server();
-
-$server->configureWSDL('login service', 'urn:verificarLogin');
-
-
-$server->register('Sumar',                								// METODO
-				array('usuario' => 'xsd:string','password' => 'xsd:string'),  		// PARAMETROS D ENTRADA
-				array('return' => 'xsd:bool'),    							// PARAMETROS DE SALIDA
-				'urn:verificarLogin',                								// NAMESPACE
-				'urn:verificarLogin#LetLogin',               							// ACCION SOAP
-				'rpc',                        								// ESTILO
-				'encoded',                    								// CODIFICADO
-				'deja logear si el usuario esta registrado'    										// DOCUMENTACION
-				);
-
-
-public function LetLogin($usuario,$contraseña)
-{
-	if(Usuario::ExisteUsuario($usuario,$contaseña) === TRUE){
-
-
-			session_start();			
-			$_SESSION["user"] = $user;		
-			echo "ok";
-		}
-		else
-			echo "error";
+		$letLogin = FALSE;
 		
-	}		
+		$user = $_POST["usuario"]  ? $_POST["usuario"]  : NULL;
+		$pass = $_POST["password"] ? $_POST["password"] : NULL;
+
+		if (isset($user) && isset($pass)) {
+
+			$respuestaWS = $client->call('LetLogin',array($user,$pass));				
+		}
+
+	}
+	else if($_POST["op"] == "logout")
+	{	
+		session_start();		
+		$_SESSION["user"] = NULL;
+		session_destroy();
+
+		$respuestaWS = "ok";
+	}
+
+	if ($client->fault) {
+		print_r($respuestaWS);
+	} 
+
+	$err = $client->getError();
+	if ($err) {
+		print_r($err);
+	} 
+	else {
+		print_r($respuestaWS);
+	}
+
 }
-
-
-
-
-
-*/
-
-
 
 ?>

@@ -18,7 +18,7 @@ function LogOut()
 			}
 			else
 			{
-				console.log("error");
+				console.log("error"+valor);
 			}
 		})		
 		.fail(function(jqXHR, textStatus, errorThrown){
@@ -38,21 +38,19 @@ function LogIn()
 		async:true,
 		})
 		.done(function(valor){
-
-			
+		
 			$("#resultado").empty();
 			
-			console.log(valor);
-
 			if (valor == "ok")
 			{
 				window.location.href = "miPagina.php";
 			}
 			else
 			{	
+				console.log("error"+valor);
 				
 				var html = "<div class='alert alert-danger'>";
-				  	html += "<strong>Error!</strong> Usuario o contraseña incorrectos.</div>";
+				  	html += "<strong>Error!</strong> Usuario o contraseña incorrectos.</div>";			  
 				
 				$(html).appendTo("#resultado");
 			}

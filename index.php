@@ -3,10 +3,11 @@
 use \Psr\Http\Message\ServerRequestInterface as Request;
 use \Psr\Http\Message\ResponseInterface as Response;
 
-require 'vendor/autoload.php';
-include_once '/clases/Vehiculo.php';
-include_once '/php/AccesoDatos.php';
+require './vendor/autoload.php';
+require_once __DIR__ . '\clases\Vehiculo.php';
 
+header("Access-Control-Allow-Origin: *");
+header("Access-Control-Allow-Headers-Allow-Origin: X-Requested-With, Content-Type, Accept");
 $config['displayErrorDetails'] = true;
 $config['addContentLengthHeader'] = false;
 
@@ -15,68 +16,52 @@ $app = new \Slim\app(["settings" => $config]);
 session_start();
 
 
-$app->get('/damealgo', function($request,$response)
-{
-    return "tedoyalgo";
-});
-
-$app->get('/', function ($request,$response) {
-    return $response->withRedirect("./principal.html");
+$app->get('/', function (Request $request,Response $response) {
+    return $response->withRedirect("/miPagina.html");
 });
 
 /*
 *   Ingresa un auto a la cochera.
 */
-$app->POST('/POST/ingresarAuto', function($request,$response)  {
+$app->POST('/ingresarAuto', function(Request $request, Response $response)  {
 
-    $patente = $_POST["patente"] ?: NULL;
-    $color   = $_POST["color"]   ?: NULL;
-    $marca   = $_POST["marca"]   ?: NULL;
+    $autoIngresando = $request->getParsedBody();
 
-    if (isset($patente) && isset($color) && isset($marca)) {
-        
-        $conexion = AccesoDatos::dameUnObjetoAcceso();
-        $statement = $conexion->RetornarConsulta("INSERT INTO cocheralive (`patente`, `color`, `marca`, `entrada`) VALUES (?,?,?,NOW())");
-
-        $statement->bindParam(1,$patente);
-        $statement->bindParam(2,$color);
-        $statement->bindParam(3,$marca);
- 
-        if ($statement->execute()) {
-            echo "ok";
-        }
-        else
-            echo "error";
+    if (isset($autoIngresando)) {
+        $respuesta = Vehiculo::IngresarAuto($autoIngresando);
     }
     else
-        echo "error";
+        $respuesta =  "error";
 
+    echo $respuesta;    
 });
 
 
 /*                       FUNCIONANDO!!!
 * Retorna JSON con tabla de autos estacionados en este momento.
 */ 
-$app->get('/get/autosLive', function(Request $request, Response $response){
+$app->get('/autosLive', function(Request$request, Response$response){
 
     $autoslive = Vehiculo::TraerTodos();
-    // Indicamos el tipo de contenido y condificación que devolvemos desde el framework Slim.
+    
     $response->getBody()->write(json_encode($autoslive));
 });
 
 /*
 *   Remuve un auto de acuerdo al id pasado.
 */
-$app->delete('/auto/{id}', function(Request $request, Response $response, $args){
-
-        $id = $args['id'];
-        $respuesta = "errorenapi";
-
+$app->delete('/egresar/{id}', function(Request $request, Response $response){
+        
+        $respuesta = "errorenapi";      
+        $id = $request->getAttribute('id');
+       
         if (isset($id)) {
-             $respuesta = Vehiculo::DameUnAuto($id);
+             $respuesta = Vehiculo::EgresarAuto($id);
         }
 
-        $response->getBody()->write("pepe piola");
+        $response->getBody()->write($respuesta);
 });
 
 $app->run();
+
+?>

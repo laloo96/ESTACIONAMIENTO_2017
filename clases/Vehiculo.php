@@ -1,5 +1,6 @@
 <?php
-require_once('../php/AccesoDatos.php');
+
+require_once('./php/AccesoDatos.php');
 
 class Vehiculo
 {
@@ -84,82 +85,95 @@ class Vehiculo
 //--------------------------------------------------------------------------------//
 //--METODOS DE CLASE
 
-	/*
+	/*  FUNCIONAAA!!
 	* Ingresa un auto en la chochera.
-	*//*
-	public static function IngresarAuto()
-    {
+	*/
+	public static function IngresarAuto($autoIngresando)
+    {	
+		$conexion = AccesoDatos::dameUnObjetoAcceso();
+        $statement = $conexion->RetornarConsulta("INSERT INTO cocheralive (`patente`, `color`, `marca`, `entrada`) VALUES (?,?,?,NOW())");
 
+        $statement->bindParam(1,$autoIngresando["patente"]);
+        $statement->bindParam(2,$autoIngresando["color"]);
+        $statement->bindParam(3,$autoIngresando["marca"]);
+ 
+        if ($statement->execute()) {
+            $rta = "echo ejecuto bien";
+        }
+        else
+            $rta =  "error al ejecutar query";
+
+		return $rta;
     }
-*/
-	/*
+
+	
+	/*     FUNCIONAAA!!
 	*	Remuve el auto de los estacionados y lo registra en la tabla de autos egresados.
 	*/
     public static function EgresarAuto($id){	
 		
+		$respuesta = "error";
+		
 		if (isset($id)) {	
-
-			$respuesta = "error";
-
+			
 			$vehiculoaegresar = Vehiculo::DameUnAuto($id);
-
-			echo"ME DIO ESTE AUTO";
-			var_dump($vehiculoaegresar);
 			
-        	$conexion = AccesoDatos::dameUnObjetoAcceso();
-			$statement = $conexion->RetornarConsulta("DELETE FROM cocheralive WHERE id=?");
-
-			$statement->bindParam(1,$id);
-			
-			if($statement->execute()){   
-
-				echo"ESTOY POR REGISTRAR SALIDA YA LO ELIMINE";
-				var_dump($vehiculoaegresar);
+			if ($vehiculoaegresar !== NULL) {
 				
-				if (Vehiculo::RegistrarSalida($vehiculoaegresar) === TRUE) {
-					$respuesta = "ok";
-				}
-			}	
+				$conexion = AccesoDatos::dameUnObjetoAcceso();
+				$statement = $conexion->RetornarConsulta("DELETE FROM cocheralive WHERE id=?");
+
+				$statement->bindParam(1,$id);
+				
+				if($statement->execute()){   
+				
+					if (Vehiculo::RegistrarSalida($vehiculoaegresar) === TRUE) {
+						$respuesta = "ok";
+					}
+				}	
+			}
 		}
 		
 		return $respuesta;
     }
 
-	public static function RegistrarSalida($autoaegresar)
+	/*					FUNCIONA!!!
+	*	Registra el auto que aca de salir en la tabla de los egresos.
+	*/
+	public static function RegistrarSalida($auto)
 	{	
+			var_dump($auto);
+
 			$conexion = AccesoDatos::dameUnObjetoAcceso();
 
-			$statement = $conexion->RetornarConsulta("INSERT INTO `egresos`(`color`, `patente`, `marca`, `entrada`, `salida`) VALUES (?,?,?,?,NOW())");  
+			$statement = $conexion->RetornarConsulta("INSERT INTO egresos (`color`, `patente`, `marca`, `entrada`, `salida`) VALUES (:color,:patente,:marca,:entrada,NOW())");  
 
-			$statement->bindParam(1,$autoaegresar['color']);
-			$statement->bindParam(2,$autoaegresar['patente']);
-			$statement->bindParam(3,$autoaegresar['marca']);
-			$statement->bindParam(4,$autoaegresar['entrada']);
+			$statement->bindParam(':color',$auto[0]['color']);
+			$statement->bindParam(':patente',$auto[0]['patente']);
+			$statement->bindParam(':marca',$auto[0]['marca']);
+			$statement->bindParam(':entrada',$auto[0]['entrada']);
 
 			if ($statement->execute()) {
-				return TRUE;
+				return "ok";
 			}
 			else
-				return FALSE;
+				return "error";
 	}
 
-	/*
+	/*     FUNCIONA!!!
 	* Retorna el auto estacionado segun el id pasado.
 	*/
 	public static function DameUnAuto($id)
 	{	
-		$vehiculo = "nada";	
-
-		echo "aca esta el aidi en functiones".$id;
-
+		$vehiculo = NULL;	
+		
 		$conexion = AccesoDatos::dameUnObjetoAcceso();
 		$statement = $conexion->RetornarConsulta("SELECT * FROM cocheralive WHERE id=?");  
 
 		$statement->bindParam(1,$id);
 		
 		if($statement->execute()){   
-			$vehiculo = $statement->fetchall(); 
-			var_dump($vehiculo);
+			$vehiculo = $statement->fetchall();
 		}
 		else
 			echo "error";

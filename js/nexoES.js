@@ -31,10 +31,10 @@ function DisplayTablaSalida()
 		$("#es").empty();
 		
 		$.ajax({
-		type:"GET", 
-		dataType:"JSON", 
+		type:"get", 
+		dataType:"json", 
+		url:"http://localhost:8080/TP_ESTACIONAMIENTO2017/autosLive",
 		crossDomain: true,
-		url:"http://localhost:8080/TP_ESTACIONAMIENTO2017/php/AdministrarES.php/autosLive",
 		async:true,
 		})
 		.done(function(valor){
@@ -88,6 +88,9 @@ function CalcularImporte(horasYmin)
 
 }*/
 
+/*
+* Argega el auto pasado.
+*/
 function AgregarAuto()
 {
     var datos = "marca=" + $("#marca").val() + "&color=" + $("#color").val()+ "&patente=" + $("#patente").val() + "&op=ingreso";
@@ -95,7 +98,7 @@ function AgregarAuto()
 		$.ajax({
 		type:"POST", 
 		dataType:"Text", 
-		url:"http://localhost:8080/TP_ESTACIONAMIENTO2017/php/AdministrarES.php/ingresarAuto",
+		url:"http://localhost:8080/TP_ESTACIONAMIENTO2017/ingresarAuto",
 		crossDomain: true,
 		data:datos,
 		async:true,
@@ -113,15 +116,19 @@ function AgregarAuto()
 		})
 }
 
+/*
+* Llama a la api que elimina el auto pasado por id.
+*/
 function RetirarAuto(idAEliminar)
 {
-    //var datos = "id=" + idAEliminar + "&op=RemoverAuto";
-
 		$.ajax({
 		type:"DELETE", 
-		dataType:"Text", 
-		url:"/php/AdministrarES.php/",
-		data:{id: idAEliminar},
+		dataType:"json", 
+		url:"http://localhost:8080/TP_ESTACIONAMIENTO2017/egresar",
+		crossDomain: true,
+		data:{
+			id: idAEliminar
+		},
 		async:true,
 		})
 		.done(function(valor){
