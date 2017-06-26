@@ -1,6 +1,6 @@
 <?php 
 
-require_once('../nusoap-0.9.5/lib/nusoap.php'); 
+require_once('../lib/nusoap.php'); 
 require_once('../clases/Usuario.php');
 require_once('../php/AccesoDatos.php');
 
@@ -19,19 +19,38 @@ $server->register('LetLogin',                									// METODO
 				'deja logear si el usuario esta registrado'    					// DOCUMENTACION
 				);
 
+$server->register('RegistrarLogin',                									// METODO
+				array('user' => 'xsd:string'),  	// PARAMETROS D ENTRADA
+				array('return' => 'xsd:string'),    							 // PARAMETROS DE SALIDA
+				'urn:verificarLogin',                							// NAMESPACE
+				'urn:verificarLogin#RegistrarLogin',               					// ACCION SOAP
+				'rpc',                        								    // ESTILO
+				'encoded',                    								    // CODIFICADO
+				'guarda la hora y usuario logeado'    					// DOCUMENTACION
+);
+
 
 function LetLogin($usuario,$password)
 {	
 	$retorno = "errorenWS";
 
 	if(Usuario::ExisteUsuario($usuario,$password) === TRUE){
-
-			session_start();			
-			$_SESSION["user"] = $usuario;		
-			$retorno =  "ok";
+		
+		$retorno = "ok";
 	}
 
 	return $retorno;	
+}
+
+function RegistrarLogin($usuario)
+{	
+	$retorno = "errroenWS";
+
+	if (Usuario::SeLogeo($usuario) === TRUE) {
+		$retorno = "ok";
+	}
+
+	return $retorno;
 }
 
 $HTTP_RAW_POST_DATA = file_get_contents("php://input");

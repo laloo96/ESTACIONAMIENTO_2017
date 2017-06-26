@@ -5,10 +5,10 @@ var hourDiff = timeEnd - timeStart; //in ms
 var secDiff = hourDiff / 1000; //in s
 var minDiff = hourDiff / 60 / 1000; //in minutes
 var hDiff = hourDiff / 3600 / 1000; //in hours
-var humanReadable = {};
-humanReadable.hours = Math.floor(hDiff);
-humanReadable.minutes = minDiff - 60 * humanReadable.hours;
-console.log(humanReadable); //{hours: 0, minutes: 30}
+var hora = {};
+hora.hours = Math.floor(hDiff);
+hora.minutes = minDiff - 60 * hora.hours;
+console.log(hora); //{hours: 0, minutes: 30}
  */
 
 
@@ -40,7 +40,7 @@ function DisplayTablaSalida()
 		.done(function(valor){
 
 			var html = '<table class="table table-bordered table-responsive"><thead class="thead-inverse"><tr><th>Marca</th>'+
-						'<th>Color</th><th>Patente</th><th>Hora Entrada</th><th>Tiempo Transcurrido (HS)</th><th>Retirar</th></tr></thead><tbody>';
+						'<th>Color</th><th>Patente</th><th>Hora Entrada</th><th>Tiempo Transcurrido (HS:MIN)</th><th>Importe a pagar</th><th>Retirar</th></tr></thead><tbody>';
 				
 				for (var i = 0; i < valor.length; i++) {
 
@@ -58,16 +58,23 @@ function DisplayTablaSalida()
 					
 					var hourDiff = horaActual - horaDeEntrada;
 
-					var hDiff = hourDiff / 3600 / 1000; 
-
-					var horasTranscurridasINT = Math.floor(hDiff);
+					var hDiff = hourDiff / 3600 / 1000; //horas
 					
+					var minDiff = hourDiff / 60 / 1000; //minutos
+
+					var hora = {};
+					
+					hora.hours = Math.floor(hDiff);
+					
+					hora.minutes = minDiff - 60 * hora.hours;
 
 				    html += '<td>' + valor[i].marca + '</td>';
 				    html += '<td>' + valor[i].color + '</td>';
 				    html += '<td>' + valor[i].patente + '</td>';
 					html += '<td>' + valor[i].entrada + '</td>';
-					html += '<td>' + horasTranscurridasINT + '</td>';
+					html += '<td>' + hora.hours+':'+Math.round(hora.minutes)+ '</td>';
+					html += '<td>' + CalcularImporte(hora.hours,hora.minutes)+ '</td>';
+
 					//html += '<td>' + CalcularImporte(horasTranscurridasINT) + '</td>';
 					html += '<td>' + '<a class="btn btn-primary btn-md" onclick="RetirarAuto('+valor[i].id+')">Retirar Auto</a>' + '</td>';    
 				    html += "</tr>";
@@ -75,7 +82,7 @@ function DisplayTablaSalida()
 				html += '</tbody></table>';
 
 				$(html).appendTo("#es");
-
+				
 		})		
 		.fail(function(jqXHR, textStatus, errorThrown){
 			alert(jqXHR.responseText + "\n" + textStatus + "\n" + errorThrown);
@@ -83,10 +90,33 @@ function DisplayTablaSalida()
 }
 
 /*
-function CalcularImporte(horasYmin)
+* Calcula el importe a pagar segun las horas y los minutos transcurridos.
+*/
+function CalcularImporte(horas,minutos)
 {
+	$.ajax({
+		type:"GET", 
+		dataType:"json", 
+		url:"http://localhost:8080/TP_ESTACIONAMIENTO2017/calcularimporte",
+		crossDomain: true,
+		data:
+		{
+			"horas": horas,
+			"minutos": minutos
+		},
+		async:true,
+		})
+		.done(function(valor){
 
-}*/
+			console.log(valor);
+
+		})		
+		.fail(function(jqXHR, textStatus, errorThrown){
+			alert(jqXHR.responseText + "\n" + textStatus + "\n" + errorThrown);
+	})
+
+	return valor;
+}
 
 /*
 * Argega el auto pasado.
@@ -106,9 +136,6 @@ function AgregarAuto()
 		.done(function(valor){
 
 			console.log("ingreso");
-			/*if (condition) {
-
-			}*/
 
 		})		
 		.fail(function(jqXHR, textStatus, errorThrown){
@@ -124,15 +151,12 @@ function RetirarAuto(idAEliminar)
 		$.ajax({
 		type:"DELETE", 
 		dataType:"json", 
-		url:"http://localhost:8080/TP_ESTACIONAMIENTO2017/egresar",
+		url:"http://localhost:8080/TP_ESTACIONAMIENTO2017/egresar/"+idAEliminar,
 		crossDomain: true,
-		data:{
-			id: idAEliminar
-		},
 		async:true,
 		})
 		.done(function(valor){
-
+			console.log(valor.respuesta);
 			if (valor == "ok") {
 				DisplayTablaSalida();
 			}

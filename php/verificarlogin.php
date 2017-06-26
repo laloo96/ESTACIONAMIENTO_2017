@@ -1,6 +1,6 @@
 <?php
 
-require_once('../nusoap-0.9.5/lib/nusoap.php');
+require_once('../lib/nusoap.php');
 
 $host = 'http://localhost:8080/TP_ESTACIONAMIENTO2017/php/loginWS.php';
 
@@ -25,12 +25,21 @@ else{
 
 		if (isset($user) && isset($pass)) {
 
-			$respuestaWS = $client->call('LetLogin',array($user,$pass));				
+			$respuestaLogin    = $client->call('LetLogin',array($user,$pass));
+			$respuestaRegistro = $client->call('RegistrarLogin',array($user));
+			
+			if ($respuestaLogin == "ok" && $respuestaRegistro == "ok") {
+				
+				session_start();						
+				$_SESSION["user"] = $user;	
+				$respuestaWS = "ok";	
+			}
 		}
 
 	}
 	else if($_POST["op"] == "logout")
 	{	
+		
 		session_start();		
 		$_SESSION["user"] = NULL;
 		session_destroy();
@@ -43,6 +52,7 @@ else{
 	} 
 
 	$err = $client->getError();
+	
 	if ($err) {
 		print_r($err);
 	} 

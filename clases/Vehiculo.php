@@ -112,7 +112,7 @@ class Vehiculo
 	*/
     public static function EgresarAuto($id){	
 		
-		$respuesta = "error";
+		$succes = FALSE;
 		
 		if (isset($id)) {	
 			
@@ -128,13 +128,13 @@ class Vehiculo
 				if($statement->execute()){   
 				
 					if (Vehiculo::RegistrarSalida($vehiculoaegresar) === TRUE) {
-						$respuesta = "ok";
+						$succes = TRUE;
 					}
 				}	
 			}
 		}
 		
-		return $respuesta;
+		return $succes;
     }
 
 	/*					FUNCIONA!!!
@@ -142,8 +142,6 @@ class Vehiculo
 	*/
 	public static function RegistrarSalida($auto)
 	{	
-			var_dump($auto);
-
 			$conexion = AccesoDatos::dameUnObjetoAcceso();
 
 			$statement = $conexion->RetornarConsulta("INSERT INTO egresos (`color`, `patente`, `marca`, `entrada`, `salida`) VALUES (:color,:patente,:marca,:entrada,NOW())");  
@@ -154,10 +152,10 @@ class Vehiculo
 			$statement->bindParam(':entrada',$auto[0]['entrada']);
 
 			if ($statement->execute()) {
-				return "ok";
+				return TRUE;
 			}
 			else
-				return "error";
+				return FALSE;
 	}
 
 	/*     FUNCIONA!!!

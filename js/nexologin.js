@@ -43,7 +43,7 @@ function LogIn()
 			
 			if (valor == "ok")
 			{
-				window.location.href = "miPagina.php";
+				window.location.href = "./miPagina.php";
 			}
 			else
 			{	

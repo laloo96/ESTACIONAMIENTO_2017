@@ -88,6 +88,20 @@ class Usuario
 			return $todoslosusuarios;
 		}
 
+		public static function SeLogeo($user)
+		{
+			$conexion = AccesoDatos::dameUnObjetoAcceso();
+    		$statement = $conexion->RetornarConsulta("INSERT INTO estadisticaslogin (`usuario`, `horalogin`) VALUES (?,NOW())");
+
+			$statement->bindParam(1,$user);
+
+			if ($statement->execute()) {
+				return TRUE;
+			}	
+			else
+				return FALSE;
+		}
+
 	//--------------------------------------------------------------------------------//    
  
 }

@@ -8,12 +8,15 @@ require_once __DIR__ . '\clases\Vehiculo.php';
 
 header("Access-Control-Allow-Origin: *");
 header("Access-Control-Allow-Headers-Allow-Origin: X-Requested-With, Content-Type, Accept");
+header("Access-Control-Allow-Methods: GET,POST,PUT,DELETE,UPDATE,OPTIONS");
 $config['displayErrorDetails'] = true;
 $config['addContentLengthHeader'] = false;
 
 $app = new \Slim\app(["settings" => $config]);
 
 session_start();
+
+
 
 
 $app->get('/', function (Request $request,Response $response) {
@@ -47,19 +50,34 @@ $app->get('/autosLive', function(Request$request, Response$response){
     $response->getBody()->write(json_encode($autoslive));
 });
 
+/*                       FUNCIONANDO!!!
+* Calcula el importe.
+*/ 
+$app->get('/calcularimporte', function(Request$request, Response$response){
+
+     $tiempos = $request->getParsedBody();
+
+     var_dump($tiempos);
+    
+
+});
+
 /*
 *   Remuve un auto de acuerdo al id pasado.
 */
 $app->delete('/egresar/{id}', function(Request $request, Response $response){
         
-        $respuesta = "errorenapi";      
+        $respuesta = "ok";     
         $id = $request->getAttribute('id');
-       
+
+        
         if (isset($id)) {
-             $respuesta = Vehiculo::EgresarAuto($id);
+             if (Vehiculo::EgresarAuto($id)) {
+                 $respuesta = "ok";
+             }
         }
 
-        $response->getBody()->write($respuesta);
+         $response->getBody()->write(json_encode($respuesta));
 });
 
 $app->run();
