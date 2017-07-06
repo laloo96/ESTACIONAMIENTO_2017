@@ -40,7 +40,7 @@ function DisplayTablaSalida()
 		.done(function(valor){
 
 			var html = '<table class="table table-bordered table-responsive"><thead class="thead-inverse"><tr><th>Marca</th>'+
-						'<th>Color</th><th>Patente</th><th>Hora Entrada</th><th>Tiempo Transcurrido (HS:MIN)</th><th>Importe a pagar</th><th>Retirar</th></tr></thead><tbody>';
+						'<th>Color</th><th>Patente</th><th>Hora Entrada</th><th>Tiempo Transcurrido (HS)</th><th>Importe a pagar</th><th>Retirar</th></tr></thead><tbody>';
 				
 				for (var i = 0; i < valor.length; i++) {
 
@@ -72,8 +72,8 @@ function DisplayTablaSalida()
 				    html += '<td>' + valor[i].color + '</td>';
 				    html += '<td>' + valor[i].patente + '</td>';
 					html += '<td>' + valor[i].entrada + '</td>';
-					html += '<td>' + hora.hours+':'+Math.round(hora.minutes)+ '</td>';
-					html += '<td>' + CalcularImporte(hora.hours,hora.minutes)+ '</td>';
+					html += '<td>' + hora.hours+':'+Math.round(hora.minutes)+"HS" + '</td>';
+					html += '<td>' + CalcularImporte(hora.hours,hora.minutes)+'</td>';
 
 					//html += '<td>' + CalcularImporte(horasTranscurridasINT) + '</td>';
 					html += '<td>' + '<a class="btn btn-primary btn-md" onclick="RetirarAuto('+valor[i].id+')">Retirar Auto</a>' + '</td>';    
@@ -94,7 +94,51 @@ function DisplayTablaSalida()
 */
 function CalcularImporte(horas,minutos)
 {
-	$.ajax({
+		var importeXhoras = 0;
+		var importeXmediahoras = 0;
+		var importeFinal = 0;
+		var horasdedecimales = 0;
+		var venticuatro = 0;
+		var docehoras = 0;
+
+
+
+        if(horas > 12 && horas < 24)
+        {	
+			//Cantidad de "12horas" que estuvo estacionado.
+        	var docehoras = parseInt(horas) / 12;
+			// Cantidad de  "decimales de doce horas" estuvo.
+			var decimalesdedocehora  = horas - parseInt(horas);
+
+			horasdedecimales = decimalesdedocehora * 12;
+			
+			importeXhoras = (docehoras * 90) +  parseInt(horasdedecimales);
+
+        }
+        else
+        {
+            var venticuatro = parseInt(horas) / 12;
+			// Cantidad de  "decimales de doce horas" estuvo.
+			var decimalesdeventicuatro  = horas - parseInt(horas);
+
+			horasdedecimales = decimalesdeventicuatro * 12;
+			
+			importeXhoras = (venticuatro * 90) +  parseInt(horasdedecimales);
+
+
+		}           
+        
+		if (minutos > 35) {
+            importeXmediahoras = 10;
+        }
+        else
+            importeXmediahoras = 5;
+
+        importeFinal  = importeXhoras + importeXmediahoras;  
+
+		return importeFinal;  
+
+	/*$.ajax({
 		type:"GET", 
 		dataType:"json", 
 		url:"http://localhost:8080/TP_ESTACIONAMIENTO2017/calcularimporte",
@@ -106,17 +150,17 @@ function CalcularImporte(horas,minutos)
 		},
 		async:true,
 		})
-		.done(function(valor){
+		.done(function(importe){
 
-			console.log(valor);
-
+			
 		})		
 		.fail(function(jqXHR, textStatus, errorThrown){
 			alert(jqXHR.responseText + "\n" + textStatus + "\n" + errorThrown);
-	})
+	})*/
 
-	return valor;
 }
+
+
 
 /*
 * Argega el auto pasado.
@@ -156,7 +200,7 @@ function RetirarAuto(idAEliminar)
 		async:true,
 		})
 		.done(function(valor){
-			console.log(valor.respuesta);
+			
 			if (valor == "ok") {
 				DisplayTablaSalida();
 			}

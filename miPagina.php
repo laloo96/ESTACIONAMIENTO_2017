@@ -24,6 +24,8 @@ if(isset($_SESSION["user"]) || isset($_SESSION["admin"]))
 					
 					<script type="text/javascript" src="js/nexoES.js"></script>
 
+					<script type="text/javascript" src="js/nexoABMempleados.js"></script>
+
 			</head>
 
 					<nav class="navbar navbar-default">
@@ -48,7 +50,10 @@ if(isset($_SESSION["user"]) || isset($_SESSION["admin"]))
 											<li><a href="#" onclick="DisplayTablaSalida()">Salida</a></li>
 											<li><a href="#">Stats Cocheraas</a></li>
 											<li><a href="#">Stats Autos</a></li>   
-											<li><a href="#">Stats emp</a></li>     
+											<li><a href="#">Stats emp</a></li> 
+											<li><a href="#" onclick="DisplayFormAltaEmpleado()">AgregarEmp</a></li> 
+											<li><a href="#" onclick="DisplayFormGestionarEmpleados()">Gestionar Empleados</a></li> 
+											<li><a href="#" >ListaEmpleados</a></li> 
 									</ul>
 									
 										<!--LO QUE VA HACIA LA DEReCHA-->
@@ -75,6 +80,15 @@ if(isset($_SESSION["user"]) || isset($_SESSION["admin"]))
 					<div class="container">
 						<body style="background-color: #8b9ebc">
 								<div id="es">
+
+								</div>
+
+						</body>
+					</div>
+
+					<div class="container">
+						<body style="background-color: #8b9ebc">
+								<div id="tabla">
 
 								</div>
 

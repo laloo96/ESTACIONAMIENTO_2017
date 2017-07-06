@@ -1,5 +1,5 @@
 <?php
-
+session_start();	
 require_once('../lib/nusoap.php');
 
 $host = 'http://localhost:8080/TP_ESTACIONAMIENTO2017/php/loginWS.php';
@@ -27,21 +27,24 @@ else{
 
 			$respuestaLogin    = $client->call('LetLogin',array($user,$pass));
 			$respuestaRegistro = $client->call('RegistrarLogin',array($user));
-			
-			if ($respuestaLogin == "ok" && $respuestaRegistro == "ok") {
+
+			//0 significa se refiere a error.
+			if ($respuestaLogin != 0 && $respuestaRegistro == "ok") {
 				
-				session_start();						
-				$_SESSION["user"] = $user;	
+				//Si es igual a 1 es porque es usuario si es 2 es admin.
+				if ($respuestaLogin == 1) {
+					$_SESSION["user"] = $user;	
+				}
+				else
+					$_SESSION["admin"] = $user;	
+				
 				$respuestaWS = "ok";	
 			}
 		}
 
 	}
-	else if($_POST["op"] == "logout")
-	{	
-		
-		session_start();		
-		$_SESSION["user"] = NULL;
+	else
+	{			
 		session_destroy();
 
 		$respuestaWS = "ok";

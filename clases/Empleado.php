@@ -1,5 +1,5 @@
 <?php
-require_once("../php/AccesoDatos.php");
+
 
 class Empleado
 {
@@ -33,7 +33,6 @@ class Empleado
 			return $this->estado;
 		}
 
-		
 		public function SetApellido($valor)
 		{
 			$this->apellido = $valor;
@@ -96,9 +95,131 @@ class Empleado
 			return $existe;
 		}
 
+		public static function NuevoEmpleado($empleado)
+		{	
+			$exito = FALSE;
+			
+			if (!Empleado::UsuarioYaRegistrado($empleado['nombre'],$empleado['apellido'])) {
+			
+				$conexion = AccesoDatos::dameUnObjetoAcceso();	
+				$statement = $conexion->RetornarConsulta("INSERT INTO `usuarios`(`usuario`, `password`, `turno`, `nombre`, `apellido`, `estado`, `rol`) 
+																VALUES (:usuario,:pass,:turno,:nombre,:apellido,1,:rol)");
+
+				$statement->bindParam(':usuario',$empleado['usuario']);
+				$statement->bindParam(':pass',$empleado['password']);
+				$statement->bindParam(':turno',$empleado['turno']);
+				$statement->bindParam(':nombre',$empleado['nombre']);
+				$statement->bindParam(':apellido',$empleado['apellido']);
+				$statement->bindParam(':rol',$empleado['rol']);
+
+
+				if ($statement->execute()) {	
+					$exito = TRUE;
+				}
+			}
+
+			return $exito;
+		}
+
+		public static function UsuarioYaRegistrado($nombre,$apellido)
+		{
+			$existe = FALSE;
+
+			$conexion = AccesoDatos::dameUnObjetoAcceso();
+			$statement = $conexion->RetornarConsulta("SELECT * FROM `usuarios` WHERE 1");
+
+			if ($statement->execute()) {	
+
+				$data = $statement->fetchall();
+
+				foreach ($data as $value) {		
+					
+					if ($value["nombre"] == $nombre && $value["apellido"] == $apellido) {
+						$existe = TRUE;
+						break;
+					}
+				}	
+			}
+
+			return $existe;
+		}
+
+		public static function DameEsteEmpleado($nombre,$apellido)
+		{
+			$coincidencias = NULL;
+
+			$conexion = AccesoDatos::dameUnObjetoAcceso();
+			$statement = $conexion->RetornarConsulta("SELECT `usuario`, `turno`, `nombre`, `apellido`, `estado`, `rol` FROM `usuarios` WHERE nombre = :nombre AND apellido = :apellido");
+
+			$statement->bindParam(':nombre',$nombre);
+			$statement->bindParam(':apellido',$apellido);
+
+			if ($statement->execute()) {	
+
+				$coincidencias = $statement->fetchall(PDO::FETCH_ASSOC);
+			}
+
+			return $coincidencias;
+		}
+
+		public static function ActualizarEstado($usuario,$estado)
+		{
+			$succes = "error";
+
+			$conexion = AccesoDatos::dameUnObjetoAcceso();
+			
+			if ($estado == 1) {
+				$query = "UPDATE `usuarios` SET `estado`= 2 WHERE `usuario` = :usuarioToUpdate";
+			}
+			else
+				$query = "UPDATE `usuarios` SET `estado`= 1 WHERE `usuario` = :usuarioToUpdate";
+			
+			$statement = $conexion->RetornarConsulta($query);
+			$statement->bindParam(':usuarioToUpdate',$usuario);
+
+			if ($statement->execute()) {	
+				$succes = "ok";
+			}
+
+			return $succes;
+		}
+
+		public static function TraerToodosLosEmpleados()
+		{
+			$empleados = NULL;
+
+			$conexion = AccesoDatos::dameUnObjetoAcceso();	
+			
+			$statement = $conexion->RetornarConsulta("SELECT `usuario`,`turno`, `nombre`, `apellido`, `estado`, `rol` FROM `usuarios` WHERE 1");
+
+			if ($statement->execute()) {
+				
+				$empleados = $statement->fetchall(PDO::FETCH_ASSOC);
+			}
+
+			return $empleados;
+		}
+
+		public static function EliminarEmpleado($nombre,$apellido)
+		{
+			$succes = "error";
+
+			$conexion = AccesoDatos::dameUnObjetoAcceso();	
+			
+			$statement = $conexion->RetornarConsulta("DELETE FROM `usuarios` WHERE `nombre` = :nombre AND `apellido` = :apellido");
+
+			$statement->bindParam(':nombre',$nombre);
+			$statement->bindParam(':apellido',$apellido);
+
+			if ($statement->execute()) {
+				
+				$succes = "ok";
+			}
+
+			return $succes;
+		}
 	//--------------------------------------------------------------------------------//
 }
 
 
 ?>
-
