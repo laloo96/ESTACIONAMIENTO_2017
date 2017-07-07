@@ -98,27 +98,9 @@ $app->post('/nuevoempleado',function(Request $request, Response $response){
              }
         }
 
-        $response->getBody()->write(json_encode($respuesta));
+        $response->getBody()->write($respuesta);
 });
 
-/*
-*   Agrega un nuevo empleado.
-*//*
-$app->post('/nuevoempleado',function(Request $request, Response $response){
-        
-        $nuevoempleado = $request->getParsedBody();
-
-        $respuesta = "error";     
-             
-        if (isset($nuevoempleado)) {
-             
-             if (Empleado::NuevoEmpleado($nuevoempleado)) {
-                 $respuesta = "ok";
-             }
-        }
-
-        $response->getBody()->write(json_encode($respuesta));
-});*/
 
 /*
 *   Remuve un auto de acuerdo al id pasado.
@@ -159,7 +141,7 @@ $app->delete('/eliminarempleado', function(Request $request, Response $response)
         $apellido  = $_GET['apellido'];
         
         if (isset($nombre) && isset($apellido)) {
-            $response->getBody()->write(json_encode(Empleado::EliminarEmpleado($nombre,$apellido)));
+            $response->getBody()->write(Empleado::EliminarEmpleado($nombre,$apellido));
         }
 });
 

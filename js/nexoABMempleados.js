@@ -1,4 +1,3 @@
-//Error en eliminar y update.
 //porque no aparece la session.
 
 function DisplayFormAltaEmpleado()
@@ -26,8 +25,8 @@ function DisplayFormAltaEmpleado()
 function DisplayFormGestionarEmpleados()
 {
     $("#es").empty();
-
-    var html = "<input type='text' name='nombre' id='nombre' placeholder='Nombre'>";
+        var html = "<a href='#'>Buscar empleados:</a></br>";
+        html += "<input type='text' name='nombre' id='nombre' placeholder='Nombre'>";
         html += "<input type='text' name='apellido' id='apellido' placeholder='Apellido'>"; 
         html += "<input type='button' name='btnGestionarEmpleados' id='btnGestionarEmpleados' value='Buscar' onclick='GestionarEmpleados()'>"; 
     
@@ -37,7 +36,9 @@ function DisplayFormGestionarEmpleados()
 }
 
 function AgregarEmpleado()
-{
+{   
+     $("#tabla").empty();
+
      var datos = "nombre=" + $("#nombre").val() + 
                 "&apellido=" + $("#apellido").val() + 
                 "&turno=" + $("#turno").val() + 
@@ -47,7 +48,7 @@ function AgregarEmpleado()
     	
         $.ajax({
 		type:"POST", 
-		dataType:"json", 
+		dataType:"text", 
 		url:"http://localhost:8080/TP_ESTACIONAMIENTO2017/nuevoempleado",
 		crossDomain: true,
         data:datos,
@@ -162,12 +163,12 @@ function TablaEmpleados(empleados)
                     html += '<td>' + estadoToString + '</td>';
                     html += '<td>' + rolToString + '</td>';
 
-            html += '<td>' + '<a class="btn btn-danger btn-md" onclick="EliminarEmpleado("'+empleados[i].nombre+'","'+ empleados[i].apellido+'")">Eliminar</a>';
+            html += '<td>' + '<a class="btn btn-danger btn-md" onclick="EliminarEmpleado(\''+empleados[i].nombre+'\',\''+ empleados[i].apellido+'\')">Eliminar</a>';
             if (empleados[i].estado == 1) {
-                html += '<a class="btn btn-warning btn-md" onclick="ActualizarEstado("'+empleados[i].usuario+'",'+empleados[i].estado+')">Suspender</a>' + '</td>';  
+                html += '<a class="btn btn-warning btn-md" onclick="ActualizarEstado(\''+empleados[i].usuario+'\','+empleados[i].estado+')">Suspender</a>' + '</td>';  
             }
             else{
-                html += '<a class="btn btn-success btn-md" onclick="ActualizarEstado("'+empleados[i].usuario+'",'+empleados[i].estado+')">Reincorporar</a>' + '</td>'; 
+                html += '<a class="btn btn-success btn-md" onclick="ActualizarEstado(\''+empleados[i].usuario+'\','+empleados[i].estado+')">Reincorporar</a>' + '</td>'; 
             }
             html += "</tr>";        
 
@@ -179,30 +180,41 @@ function TablaEmpleados(empleados)
 }
 
 function ActualizarEstado(usuario,estado)
-{
+{   
+    var pregunta;
+    if(estado == 1)
+    {
+        pregunta = "¿Seguro que desea suspender al usuario "+usuario+"?";
+    }
+    else
+        pregunta = "¿Seguro que desea reincorporar al usuario "+usuario+"?";
 
-    $.ajax({
-		type:"PUT", 
-		dataType:"json", 
-		url:"http://localhost:8080/TP_ESTACIONAMIENTO2017/actualizarestado?usuario="+usuario+"&estado="+estado,
-		crossDomain: true,
-		async:true,
-		})
-		.done(function(valor){
+    if(confirm(pregunta))
+    {
+        $.ajax({
+            type:"PUT", 
+            dataType:"json", 
+            url:"http://localhost:8080/TP_ESTACIONAMIENTO2017/actualizarestado?usuario="+usuario+"&estado="+estado,
+            crossDomain: true,
+            async:true,
+            })
+            .done(function(valor){
 
-			if (valor == "ok") {
-				console.log("exito");
-			}
-			else
-			{
-				alert("Ha ocurrido un error");
-				window.location.href="miPagina.php";
-			}
+                if (valor == "ok") {
+                    console.log("exito");
+                    MostrarTodosLosEmpleados();
+                }
+                else
+                {
+                    alert("Ha ocurrido un error");
+                    window.location.href="miPagina.php";
+                }
 
-		})		
-		.fail(function(jqXHR, textStatus, errorThrown){
-			alert(jqXHR.responseText + "\n" + textStatus + "\n" + errorThrown);
-	})
+            })		
+            .fail(function(jqXHR, textStatus, errorThrown){
+                alert(jqXHR.responseText + "\n" + textStatus + "\n" + errorThrown);
+	        })
+    }
 }
 
 function MostrarTodosLosEmpleados()
@@ -237,7 +249,7 @@ function EliminarEmpleado(nombre,apellido)
         
         $.ajax({
             type:"delete", 
-            dataType:"json", 
+            dataType:"text", 
             url:"http://localhost:8080/TP_ESTACIONAMIENTO2017/eliminarempleado?nombre="+nombre+"&apellido="+apellido,
             crossDomain: true,
             async:true,

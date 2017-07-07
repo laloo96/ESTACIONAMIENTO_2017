@@ -28,8 +28,8 @@ else{
 			$respuestaLogin    = $client->call('LetLogin',array($user,$pass));
 			$respuestaRegistro = $client->call('RegistrarLogin',array($user));
 
-			//0 significa se refiere a error.
-			if ($respuestaLogin != 0 && $respuestaRegistro == "ok") {
+			//0 refiere a error.
+			if ($respuestaLogin !== 0 && $respuestaRegistro == "ok") {
 				
 				//Si es igual a 1 es porque es usuario si es 2 es admin.
 				if ($respuestaLogin == 1) {
@@ -44,7 +44,8 @@ else{
 
 	}
 	else
-	{			
+	{	
+		session_unset();	
 		session_destroy();
 
 		$respuestaWS = "ok";
